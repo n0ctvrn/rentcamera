@@ -168,10 +168,10 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
 }
 </style>
 
-<h2 class="sr-only">Adoy Digicam — Sewa kamera digital di Depok mulai 30 ribu</h2>
+<h2 class="sr-only">Nadoy Digicam — Sewa kamera digital di Depok mulai 30 ribu</h2>
 
 <nav>
-  <div class="nav-logo">adoy<span>digicam</span></div>
+  <div class="nav-logo">Nadoy<span>digicam</span></div>
   <button class="nav-wa">WA Admin</button>
 </nav>
 
@@ -246,15 +246,7 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
 </div>
 
 <script>
-const cameras=[
-  {id:1,name:'Sony Cybershot WX220',sub:'Sony · Standard',cat:'standard',price:35000,icon:'📷',booked:['2025-06-05','2025-06-06','2025-06-12','2025-06-13']},
-  {id:2,name:'Canon IXUS 185',sub:'Canon · Standard',cat:'standard',price:30000,icon:'📸',booked:['2025-06-03','2025-06-04','2025-06-10','2025-06-17']},
-  {id:3,name:'Lumix DMC-TZ70',sub:'Panasonic · Premium',cat:'premium',price:65000,icon:'🎞️',booked:['2025-06-08','2025-06-09','2025-06-15','2025-06-22']},
-  {id:4,name:'Sony ZV-1',sub:'Sony · Premium',cat:'premium',price:90000,icon:'🎥',booked:['2025-06-06','2025-06-07','2025-06-14','2025-06-21','2025-06-28']},
-  {id:5,name:'Fujifilm FinePix XP140',sub:'Fujifilm · Standard',cat:'standard',price:45000,icon:'📷',booked:['2025-06-01','2025-06-02','2025-06-11','2025-06-18']},
-  {id:6,name:'Tripod + Memory Card',sub:'Aksesoris · Bundle',cat:'aksesoris',price:15000,icon:'🎒',booked:['2025-06-05','2025-06-06','2025-06-19']},
-];
-
+let cameras=[];
 let curCam=null,s=null,e=null,yr=2025,mo=5;
 
 function isAvail(cam){const t=new Date().toISOString().slice(0,10);return !cam.booked.includes(t);}
@@ -270,7 +262,7 @@ function render(cat='all'){
   const list=cat==='all'?cameras:cameras.filter(c=>c.cat===cat);
   g.innerHTML=list.map(c=>{
     const ok=isAvail(c);
-    return `<div class="cam-card" onclick="openM(${c.id})">
+    return `<div class="cam-card">
       <div class="cam-card-img" style="background:${c.cat==='premium'?'#FFF0F6':c.cat==='aksesoris'?'#F0FAF8':'#F8F4FF'}">
         <span class="cam-sticker ${ok?'sticker-ok':'sticker-no'}">${ok?'Tersedia':'Disewa'}</span>
         <span style="font-size:60px">${c.icon}</span>
@@ -279,7 +271,7 @@ function render(cat='all'){
         <div class="cam-card-name">${c.name}</div>
         <div class="cam-card-sub">${c.sub}</div>
         <div class="cam-card-price">Rp ${c.price.toLocaleString('id-ID')} <span>/hari</span></div>
-        <button class="cam-card-btn">Cek Tanggal & Pesan</button>
+        <button type="button" class="cam-card-btn" onclick="openM(${c.id})">Cek Tanggal & Pesan</button>
       </div>
     </div>`;
   }).join('');
@@ -322,7 +314,9 @@ function renderCal(){
       ${Array.from({length:dim},(_,i)=>{
         const day=i+1;
         const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-        const past=ds<today,booked=bk.includes(ds),isToday=ds===today;
+        const booked=bk.includes(ds);
+        const past=ds<today;
+        const isToday=ds===today;
         let cls='cal-d';
         if(past)cls+=' past';
         else if(booked)cls+=' booked';
@@ -437,7 +431,15 @@ function goS2(){
     <button class="submit-btn" onclick="doSubmit()">Konfirmasi Pesanan</button>`;
 }
 
-function doSubmit(){
+function getRangeDates(start,end){
+  const dates=[];
+  for(let cur=new Date(start);cur<=new Date(end);cur.setDate(cur.getDate()+1)){
+    dates.push(cur.toISOString().slice(0,10));
+  }
+  return dates;
+}
+
+async function doSubmit(){
   const fn=document.getElementById('fn').value.trim();
   const fw=document.getElementById('fw').value.trim();
   const fk=document.getElementById('fk').value.trim();
@@ -447,13 +449,41 @@ function doSubmit(){
   const ed=e||s;
   const days=diff(s,ed);
   const total=days*c.price;
-  const oid='ADY-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  const note=document.getElementById('fc').value.trim();
+  const payload={
+    cameraId:c.id,
+    start:s,
+    end:ed,
+    duration:days,
+    total,
+    name:fn,
+    phone:fw,
+    ktp:fk,
+    address:fa,
+    note
+  };
+
+  const resp = await fetch('/api/book', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+
+  if(!resp.ok){
+    const err = await resp.json().catch(()=>({message:'Gagal menyimpan booking'}));
+    alert(err.message||'Gagal menyimpan booking');
+    return;
+  }
+
+  const { orderId } = await resp.json();
+  const newDates = getRangeDates(s,ed);
+  curCam.booked = Array.from(new Set([...curCam.booked,...newDates])).sort();
   document.getElementById('mbody').innerHTML=`
     <div class="success">
       <span class="success-icon" style="font-size:52px">🎉</span>
       <h3>Pesanan masuk, ${fn.split(' ')[0]}!</h3>
       <p>Admin bakal WA kamu sebentar lagi buat konfirmasi jadwal pengiriman. Siapkan KTP & uang tunai ya!</p>
-      <div class="success-id">ID: ${oid}</div>
+      <div class="success-id">ID: ${orderId}</div>
       <div style="background:#F8F4FF;border-radius:12px;padding:14px;text-align:left;font-size:0.8rem;border:1.5px solid #E0D8FF;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Kamera</span><span style="font-weight:600">${c.name}</span></div>
         <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Tanggal</span><span style="font-weight:600">${fmt(s)} – ${fmt(ed)}</span></div>
@@ -465,5 +495,15 @@ function doSubmit(){
     </div>`;
 }
 
-render();
+async function loadCameras(){
+  try{
+    const resp = await fetch('/api/cameras');
+    cameras = await resp.json();
+    render();
+  }catch{
+    alert('Gagal memuat data kamera. Pastikan server sudah berjalan.');
+  }
+}
+
+loadCameras();
 </script>
