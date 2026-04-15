@@ -179,7 +179,7 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
 
 <div class="hero">
   <div class="hero-sticker">Depok & Sekitarnya</div>
-  <h1>Sewa Digicam<br><span>Mulai 30K Aja!</span></h1>
+  <h1>Sewa Digicam<br><span>Mulai 50K Aja!</span></h1>
   <p class="hero-sub">COD ke lokasi kamu · Gak ribet · Langsung jepret</p>
   <div class="hero-pills">
     <span class="hero-pill">Sony Cybershot</span>
@@ -187,14 +187,13 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
     <span class="hero-pill">Lumix</span>q
     <span class="hero-pill">+ Aksesoris</span>
   </div>
-  <span class="hero-cam" style="font-size:16px">📷</span>
-  <span style="font-size:72px;display:block;margin-bottom:-4px">📷</span>
+  
 </div>
 <div class="hero-tape"></div>
 
 <div class="stats-bar">
-  <div class="stat-item"><div class="stat-num">50+</div><div class="stat-lbl">Unit tersedia</div></div>
-  <div class="stat-item"><div class="stat-num">30K</div><div class="stat-lbl">Mulai dari</div></div>
+  <div class="stat-item"><div class="stat-num">10+</div><div class="stat-lbl">Unit tersedia</div></div>
+  <div class="stat-item"><div class="stat-num">50k</div><div class="stat-lbl">Mulai dari</div></div>
   <div class="stat-item"><div class="stat-num">COD</div><div class="stat-lbl">Bayar pas terima</div></div>
   <div class="stat-item"><div class="stat-num">Depok</div><div class="stat-lbl">Area layanan</div></div>
 </div>
@@ -221,7 +220,7 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
       <div class="syarat-item">
         <div class="syarat-icon" style="font-size:16px">💵</div>
         <div style="font-weight:600;font-size:0.78rem">Bayar COD</div>
-        <p>Siapkan uang pas saat kamera diantar</p>
+        <p>Siapkan uang tunai pas/ non tunai saat kamera diantar</p>
       </div>
       <div class="syarat-item">
         <div class="syarat-icon" style="font-size:16px">📅</div>
@@ -440,7 +439,7 @@ function goS2(){
     <div class="fg"><label>Catatan (opsional)</label><input id="fc" type="text" placeholder="Minta charger extra, dll."/></div>
     <div class="cod-box" style="margin-bottom:12px">
       <div class="cod-box-title">Metode bayar: COD (Cash on Delivery)</div>
-      <div class="cod-box-desc">Tidak ada transfer di muka. Bayar tunai Rp ${total.toLocaleString('id-ID')} saat kamera tiba di tanganmu.</div>
+      <div class="cod-box-desc">Wajib transfer di muka 50% dari harga total. Bayar sisa Rp ${(total * 0.5).toLocaleString('id-ID')} saat kamera tiba di tanganmu.</div>
     </div>
     <div class="total-strip">
       <div><div class="lbl">Total yang disiapkan</div><div style="font-size:0.7rem;color:#6060A0">${days} hari × Rp ${c.price.toLocaleString('id-ID')}</div></div>
@@ -501,7 +500,7 @@ async function doSubmit(){
     <div class="success">
       <span class="success-icon" style="font-size:52px">🎉</span>
       <h3>Pesanan masuk, ${fn.split(' ')[0]}!</h3>
-      <p>Admin bakal WA kamu sebentar lagi buat konfirmasi jadwal pengiriman, dan anda akan diminta menyelesaikan pembayaran DP 50%. Siapkan foto KTP ya!</p>
+      <p>Kirimkan kode unik dibawah ke admin untuk konfirmasi.Setelah itu anda akan diminta menyelesaikan pembayaran DP 50%. Siapkan foto KTP ya!</p>
       <div class="success-id">ID: ${orderId}</div>
       <div style="background:#F8F4FF;border-radius:12px;padding:14px;text-align:left;font-size:0.8rem;border:1.5px solid #E0D8FF;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Kamera</span><span style="font-weight:600">${c.name}</span></div>
