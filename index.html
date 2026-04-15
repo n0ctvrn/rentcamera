@@ -1,0 +1,469 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pink:#FF6B9D;--pink2:#FFD6E8;--pink3:#FFF0F6;
+  --yellow:#FFE566;--yellow2:#FFF9CC;
+  --green:#4ECDC4;--green2:#E0FAF8;
+  --dark:#1A1A2E;--dark2:#2D2D44;
+  --soft:#F8F4FF;--border:rgba(26,26,46,0.1);
+  --muted:#8585A4;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#FAFAFA;color:var(--dark)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+/* NAV */
+nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{color:white;font-size:1.1rem;font-weight:700;letter-spacing:-0.02em}
+.nav-logo span{color:var(--pink)}
+.nav-wa{background:var(--pink);color:white;border:none;padding:7px 14px;border-radius:20px;font-size:0.75rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+
+/* HERO */
+.hero{background:var(--dark);padding:28px 20px 0;text-align:center;position:relative;overflow:hidden}
+.hero-sticker{display:inline-block;background:var(--yellow);color:var(--dark);font-size:0.7rem;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px;transform:rotate(-1deg)}
+.hero h1{color:white;font-size:1.9rem;font-weight:700;line-height:1.15;margin-bottom:8px;letter-spacing:-0.03em}
+.hero h1 span{color:var(--pink)}
+.hero-sub{color:#A0A0C0;font-size:0.85rem;margin-bottom:16px}
+.hero-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.hero-pill{background:rgba(255,255,255,0.08);color:#D0D0E8;font-size:0.72rem;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.12)}
+.hero-cam{font-size:80px;display:block;margin-bottom:-8px;line-height:1}
+.hero-tape{height:12px;background:var(--pink2);margin-top:0}
+
+/* STATS BAR */
+.stats-bar{background:var(--yellow);padding:10px 20px;display:flex;gap:0;overflow-x:auto}
+.stat-item{flex:1;min-width:80px;text-align:center}
+.stat-num{font-size:1rem;font-weight:700;color:var(--dark)}
+.stat-lbl{font-size:0.62rem;font-weight:500;color:#5A5A1A}
+
+/* MAIN */
+.main{padding:20px;max-width:900px;margin:0 auto}
+.section-label{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.section-label span{font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* FILTER CHIPS */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.chip{border:1.5px solid var(--border);background:white;padding:5px 14px;border-radius:20px;font-size:0.75rem;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:'Plus Jakarta Sans',sans-serif;color:var(--dark)}
+.chip.on{background:var(--dark);color:white;border-color:var(--dark)}
+
+/* GRID */
+.cam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:32px}
+.cam-card{background:white;border-radius:16px;border:1.5px solid var(--border);overflow:hidden;cursor:pointer;transition:transform 0.15s}
+.cam-card:hover{transform:translateY(-4px)}
+.cam-card-img{height:150px;display:flex;align-items:center;justify-content:center;position:relative;font-size:0.75rem;padding:12px}
+.cam-sticker{position:absolute;top:8px;left:8px;font-size:0.62rem;font-weight:700;padding:3px 9px;border-radius:20px}
+.sticker-ok{background:var(--green2);color:#0A7A74}
+.sticker-no{background:#FFE5E5;color:#C03030}
+.cam-card-body{padding:12px}
+.cam-card-name{font-weight:600;font-size:0.9rem;margin-bottom:2px}
+.cam-card-sub{font-size:0.72rem;color:var(--muted);margin-bottom:8px}
+.cam-card-price{font-size:0.95rem;font-weight:700;color:var(--dark)}
+.cam-card-price span{font-size:0.7rem;font-weight:400;color:var(--muted)}
+.cam-card-btn{width:100%;margin-top:8px;background:var(--pink);color:white;border:none;padding:8px;border-radius:10px;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s}
+.cam-card-btn:hover{background:#E05585}
+
+/* SYARAT */
+.syarat-box{background:var(--soft);border-radius:16px;padding:16px;margin-bottom:24px;border:1.5px solid #E0D8FF}
+.syarat-title{font-weight:700;font-size:0.85rem;margin-bottom:12px;color:var(--dark)}
+.syarat-list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.syarat-item{background:white;border-radius:10px;padding:10px 12px;border:1px solid var(--border);font-size:0.78rem}
+.syarat-icon{font-size:16px;margin-bottom:2px}
+.syarat-item p{color:var(--muted);font-size:0.7rem;margin-top:2px}
+
+/* MODAL BG */
+.mbg{display:none;position:fixed;inset:0;background:rgba(26,26,46,0.65);z-index:200;align-items:flex-start;justify-content:center;padding:20px 12px;overflow-y:auto}
+.mbg.open{display:flex}
+.modal{background:white;border-radius:20px;width:100%;max-width:560px;overflow:hidden;margin:auto}
+.mhead{background:var(--dark);padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.mhead-title{color:white;font-size:1rem;font-weight:700}
+.mclose{background:none;border:none;color:#8080A0;font-size:1.2rem;cursor:pointer;line-height:1}
+.mbody{padding:20px}
+
+/* CAM DETAIL */
+.cam-top{display:flex;gap:14px;align-items:center;margin-bottom:16px}
+.cam-thumb{width:80px;height:80px;background:var(--soft);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:44px;flex-shrink:0;border:1.5px solid var(--border)}
+.cam-ti h3{font-size:1rem;font-weight:700;margin-bottom:2px}
+.cam-ti p{font-size:0.78rem;color:var(--muted);margin-bottom:6px}
+.cam-ti-price{font-size:1.1rem;font-weight:700;color:var(--pink)}
+.cam-ti-price span{font-size:0.72rem;font-weight:400;color:var(--muted)}
+
+/* STEP */
+.steps{display:flex;gap:6px;margin-bottom:18px;align-items:center}
+.step-dot{width:24px;height:24px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:var(--muted);flex-shrink:0}
+.step-dot.on{background:var(--pink);color:white}
+.step-line{flex:1;height:1.5px;background:var(--border)}
+.step-line.on{background:var(--pink)}
+
+/* CALENDAR */
+.cal-wrap{border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.cal-head-bar{background:var(--soft);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.cal-nav-btn{background:none;border:1px solid var(--border);padding:4px 10px;border-radius:8px;cursor:pointer;font-size:0.85rem;font-family:'Plus Jakarta Sans',sans-serif;color:var(--dark)}
+.cal-nav-btn:hover{background:var(--dark);color:white;border-color:var(--dark)}
+.cal-month-lbl{font-weight:600;font-size:0.85rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-dh{padding:7px 0;text-align:center;font-size:0.65rem;font-weight:600;color:var(--muted);background:var(--soft);border-bottom:1px solid var(--border)}
+.cal-d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:0.72rem;cursor:pointer;border:0.5px solid rgba(26,26,46,0.04);transition:all 0.12s;position:relative}
+.cal-d.empty{background:#FAFAFA;cursor:default}
+.cal-d.past{color:#BBBBD0;background:#F8F8FB;cursor:not-allowed}
+.cal-d.booked{background:#FFE5E5;color:#C03030;cursor:not-allowed}
+.cal-d.avail{background:white;color:var(--dark)}
+.cal-d.avail:hover{background:var(--green2);color:#0A7A74;font-weight:600}
+.cal-d.sel{background:var(--dark);color:white;font-weight:700}
+.cal-d.rng{background:var(--pink3);color:var(--dark)}
+.cal-d.today::after{content:'';position:absolute;bottom:3px;width:3px;height:3px;border-radius:50%;background:var(--pink)}
+
+/* legend */
+.cal-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.lg-item{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted)}
+.lg-dot{width:9px;height:9px;border-radius:2px}
+
+/* DATE STRIP */
+.date-strip{background:var(--soft);border-radius:12px;padding:12px 14px;display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.ds-field{flex:1;min-width:100px}
+.ds-field label{font-size:0.62rem;font-weight:700;color:var(--muted);display:block;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px}
+.ds-field p{font-weight:600;font-size:0.85rem}
+
+/* COD */
+.cod-box{background:var(--yellow2);border:1.5px solid var(--yellow);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.cod-box-title{font-weight:700;font-size:0.8rem;color:#5A5A00;margin-bottom:3px}
+.cod-box-desc{font-size:0.75rem;color:#6A6A20;line-height:1.5}
+
+/* NOTICE */
+.notice{padding:10px 13px;border-radius:10px;font-size:0.78rem;margin-bottom:12px;font-weight:500}
+.notice.ok{background:var(--green2);color:#0A7A74}
+.notice.err{background:#FFE5E5;color:#C03030}
+
+/* FORM */
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:0.75rem;font-weight:600;margin-bottom:5px;color:var(--dark)}
+.fg input,.fg textarea,.fg select{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:0.83rem;background:white;color:var(--dark);outline:none}
+.fg input:focus,.fg textarea:focus{border-color:var(--pink)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* TOTAL */
+.total-strip{background:var(--dark);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.total-strip .lbl{font-size:0.75rem;color:#8080A0}
+.total-strip .amt{font-size:1.15rem;font-weight:700;color:var(--yellow)}
+
+/* SUBMIT */
+.submit-btn{width:100%;background:var(--pink);color:white;border:none;padding:13px;border-radius:12px;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background 0.15s}
+.submit-btn:hover{background:#E05585}
+.submit-btn:disabled{background:#C0B0BC;cursor:not-allowed}
+.back-btn{background:none;border:1.5px solid var(--border);color:var(--muted);width:100%;padding:10px;border-radius:12px;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:8px}
+
+/* SUCCESS */
+.success{text-align:center;padding:20px 10px}
+.success-icon{font-size:52px;display:block;margin-bottom:14px}
+.success h3{font-size:1.2rem;font-weight:700;margin-bottom:6px}
+.success p{font-size:0.82rem;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.success-id{background:var(--soft);padding:10px 18px;border-radius:10px;display:inline-block;font-weight:700;font-size:0.88rem;margin-bottom:14px;border:1.5px solid #E0D8FF}
+.wa-btn{background:var(--green);color:white;border:none;padding:11px 24px;border-radius:12px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+
+@media(max-width:480px){
+  .hero h1{font-size:1.5rem}
+  .frow{grid-template-columns:1fr}
+  .syarat-list{grid-template-columns:1fr}
+  .cam-top{flex-direction:column;text-align:center}
+}
+</style>
+
+<h2 class="sr-only">Adoy Digicam — Sewa kamera digital di Depok mulai 30 ribu</h2>
+
+<nav>
+  <div class="nav-logo">adoy<span>digicam</span></div>
+  <button class="nav-wa">WA Admin</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-sticker">Depok & Sekitarnya</div>
+  <h1>Sewa Digicam<br><span>Mulai 30K Aja!</span></h1>
+  <p class="hero-sub">COD ke lokasi kamu · Gak ribet · Langsung jepret</p>
+  <div class="hero-pills">
+    <span class="hero-pill">Sony Cybershot</span>
+    <span class="hero-pill">Canon IXUS</span>
+    <span class="hero-pill">Lumix</span>
+    <span class="hero-pill">+ Aksesoris</span>
+  </div>
+  <span class="hero-cam" style="font-size:16px">📷</span>
+  <span style="font-size:72px;display:block;margin-bottom:-4px">📷</span>
+</div>
+<div class="hero-tape"></div>
+
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">50+</div><div class="stat-lbl">Unit tersedia</div></div>
+  <div class="stat-item"><div class="stat-num">30K</div><div class="stat-lbl">Mulai dari</div></div>
+  <div class="stat-item"><div class="stat-num">COD</div><div class="stat-lbl">Bayar pas terima</div></div>
+  <div class="stat-item"><div class="stat-num">Depok</div><div class="stat-lbl">Area layanan</div></div>
+</div>
+
+<div class="main">
+  <div class="section-label"><span>Katalog Digicam</span></div>
+  <div class="chips">
+    <button class="chip on" onclick="doFilter(this,'all')">Semua</button>
+    <button class="chip" onclick="doFilter(this,'standard')">Standard</button>
+    <button class="chip" onclick="doFilter(this,'premium')">Premium</button>
+    <button class="chip" onclick="doFilter(this,'aksesoris')">Aksesoris</button>
+  </div>
+  <div class="cam-grid" id="cgrid"></div>
+
+  <div class="section-label"><span>Syarat & Ketentuan</span></div>
+  <div class="syarat-box">
+    <div class="syarat-title">Sebelum booking, perhatikan ini ya!</div>
+    <div class="syarat-list">
+      <div class="syarat-item">
+        <div class="syarat-icon" style="font-size:16px">🪪</div>
+        <div style="font-weight:600;font-size:0.78rem">KTP Asli</div>
+        <p>Wajib ada saat COD sebagai jaminan</p>
+      </div>
+      <div class="syarat-item">
+        <div class="syarat-icon" style="font-size:16px">💵</div>
+        <div style="font-weight:600;font-size:0.78rem">Bayar COD</div>
+        <p>Siapkan uang pas saat kamera diantar</p>
+      </div>
+      <div class="syarat-item">
+        <div class="syarat-icon" style="font-size:16px">📅</div>
+        <div style="font-weight:600;font-size:0.78rem">Booking H-1</div>
+        <p>Pesan minimal 1 hari sebelum sewa</p>
+      </div>
+      <div class="syarat-item">
+        <div class="syarat-icon" style="font-size:16px">🔋</div>
+        <div style="font-weight:600;font-size:0.78rem">Kondisi Baik</div>
+        <p>Kembalikan seperti kondisi awal</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mbg" id="mbg" onclick="closeBg(event)">
+  <div class="modal" id="minner">
+    <div class="mhead">
+      <div class="mhead-title" id="mtitle">Detail & Booking</div>
+      <button class="mclose" onclick="closeM()">✕</button>
+    </div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<script>
+const cameras=[
+  {id:1,name:'Sony Cybershot WX220',sub:'Sony · Standard',cat:'standard',price:35000,icon:'📷',booked:['2025-06-05','2025-06-06','2025-06-12','2025-06-13']},
+  {id:2,name:'Canon IXUS 185',sub:'Canon · Standard',cat:'standard',price:30000,icon:'📸',booked:['2025-06-03','2025-06-04','2025-06-10','2025-06-17']},
+  {id:3,name:'Lumix DMC-TZ70',sub:'Panasonic · Premium',cat:'premium',price:65000,icon:'🎞️',booked:['2025-06-08','2025-06-09','2025-06-15','2025-06-22']},
+  {id:4,name:'Sony ZV-1',sub:'Sony · Premium',cat:'premium',price:90000,icon:'🎥',booked:['2025-06-06','2025-06-07','2025-06-14','2025-06-21','2025-06-28']},
+  {id:5,name:'Fujifilm FinePix XP140',sub:'Fujifilm · Standard',cat:'standard',price:45000,icon:'📷',booked:['2025-06-01','2025-06-02','2025-06-11','2025-06-18']},
+  {id:6,name:'Tripod + Memory Card',sub:'Aksesoris · Bundle',cat:'aksesoris',price:15000,icon:'🎒',booked:['2025-06-05','2025-06-06','2025-06-19']},
+];
+
+let curCam=null,s=null,e=null,yr=2025,mo=5;
+
+function isAvail(cam){const t=new Date().toISOString().slice(0,10);return !cam.booked.includes(t);}
+
+function doFilter(btn,cat){
+  document.querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render(cat);
+}
+
+function render(cat='all'){
+  const g=document.getElementById('cgrid');
+  const list=cat==='all'?cameras:cameras.filter(c=>c.cat===cat);
+  g.innerHTML=list.map(c=>{
+    const ok=isAvail(c);
+    return `<div class="cam-card" onclick="openM(${c.id})">
+      <div class="cam-card-img" style="background:${c.cat==='premium'?'#FFF0F6':c.cat==='aksesoris'?'#F0FAF8':'#F8F4FF'}">
+        <span class="cam-sticker ${ok?'sticker-ok':'sticker-no'}">${ok?'Tersedia':'Disewa'}</span>
+        <span style="font-size:60px">${c.icon}</span>
+      </div>
+      <div class="cam-card-body">
+        <div class="cam-card-name">${c.name}</div>
+        <div class="cam-card-sub">${c.sub}</div>
+        <div class="cam-card-price">Rp ${c.price.toLocaleString('id-ID')} <span>/hari</span></div>
+        <button class="cam-card-btn">Cek Tanggal & Pesan</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openM(id){
+  curCam=cameras.find(c=>c.id===id);
+  s=null;e=null;
+  document.getElementById('mtitle').textContent=curCam.name;
+  renderS1();
+  document.getElementById('mbg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeM(){
+  document.getElementById('mbg').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeBg(ev){if(ev.target===document.getElementById('mbg'))closeM();}
+
+const MONTHS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const DAYS=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+function fmt(d){if(!d)return'—';const dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+function diff(a,b){if(!a||!b)return 0;return Math.round((new Date(b)-new Date(a))/86400000)+1;}
+
+function renderCal(){
+  const today=new Date().toISOString().slice(0,10);
+  const fd=new Date(yr,mo,1).getDay();
+  const dim=new Date(yr,mo+1,0).getDate();
+  const bk=curCam.booked;
+  return `<div class="cal-wrap">
+    <div class="cal-head-bar">
+      <button class="cal-nav-btn" onclick="prevMo()">&#8249;</button>
+      <span class="cal-month-lbl">${MONTHS[mo]} ${yr}</span>
+      <button class="cal-nav-btn" onclick="nextMo()">&#8250;</button>
+    </div>
+    <div class="cal-grid">
+      ${DAYS.map(d=>`<div class="cal-dh">${d}</div>`).join('')}
+      ${Array(fd).fill('<div class="cal-d empty"></div>').join('')}
+      ${Array.from({length:dim},(_,i)=>{
+        const day=i+1;
+        const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const past=ds<today,booked=bk.includes(ds),isToday=ds===today;
+        let cls='cal-d';
+        if(past)cls+=' past';
+        else if(booked)cls+=' booked';
+        else if(ds===s||ds===e)cls+=' sel';
+        else if(s&&e&&ds>s&&ds<e)cls+=' rng';
+        else cls+=' avail';
+        if(isToday)cls+=' today';
+        const click=!past&&!booked;
+        return `<div class="${cls}" ${click?`onclick="pickDate('${ds}')"`:''}>${day}</div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function prevMo(){mo--;if(mo<0){mo=11;yr--;}renderS1();}
+function nextMo(){mo++;if(mo>11){mo=0;yr++;}renderS1();}
+
+function pickDate(d){
+  if(!s||(s&&e)){s=d;e=null;}
+  else if(d<s){s=d;}
+  else{
+    e=d;
+    let conflict=false;
+    const bk=curCam.booked;
+    for(let cur=new Date(s);cur<=new Date(e);cur.setDate(cur.getDate()+1)){
+      if(bk.includes(cur.toISOString().slice(0,10))){conflict=true;break;}
+    }
+    if(conflict){s=d;e=null;}
+  }
+  renderS1();
+}
+
+function renderS1(){
+  const c=curCam;
+  const ed=e||s;
+  const days=diff(s,ed)||(s?1:0);
+  const total=days*c.price;
+  let notice='';
+  if(s&&e)notice=`<div class="notice ok">Tanggal tersedia! Durasi ${days} hari = Rp ${total.toLocaleString('id-ID')}</div>`;
+  else if(s&&!e)notice=`<div class="notice ok">Pilih tanggal selesai ya!</div>`;
+
+  document.getElementById('mbody').innerHTML=`
+    <div class="cam-top">
+      <div class="cam-thumb">${c.icon}</div>
+      <div class="cam-ti">
+        <h3>${c.name}</h3>
+        <p>${c.sub}</p>
+        <div class="cam-ti-price">Rp ${c.price.toLocaleString('id-ID')} <span>/hari</span></div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step-dot on">1</div>
+      <div class="step-line"></div>
+      <div class="step-dot">2</div>
+      <div class="step-line"></div>
+      <div class="step-dot">3</div>
+    </div>
+    <div style="font-size:0.78rem;font-weight:600;margin-bottom:10px">Pilih tanggal mulai lalu tanggal selesai sewa:</div>
+    ${renderCal()}
+    <div class="cal-legend">
+      <div class="lg-item"><div class="lg-dot" style="background:white;border:1px solid #ddd"></div>Tersedia</div>
+      <div class="lg-item"><div class="lg-dot" style="background:#FFE5E5"></div>Disewa</div>
+      <div class="lg-item"><div class="lg-dot" style="background:#1A1A2E"></div>Dipilih</div>
+      <div class="lg-item"><div class="lg-dot" style="background:#FFF0F6"></div>Rentang</div>
+    </div>
+    ${notice}
+    <div class="date-strip">
+      <div class="ds-field"><label>Mulai</label><p>${fmt(s)}</p></div>
+      <div class="ds-field"><label>Selesai</label><p>${fmt(ed)}</p></div>
+      <div class="ds-field"><label>Durasi</label><p>${days>0?days+' hari':'—'}</p></div>
+    </div>
+    <div class="cod-box">
+      <div class="cod-box-title">Bayar COD pas terima kamera ya!</div>
+      <div class="cod-box-desc">Siapkan uang tunai saat kamera diantar ke lokasi kamu. Admin akan WA dulu untuk konfirmasi.</div>
+    </div>
+    <button class="submit-btn" ${s?'':'disabled'} onclick="goS2()">Lanjut Isi Data →</button>`;
+}
+
+function goS2(){
+  const c=curCam;
+  const ed=e||s;
+  const days=diff(s,ed);
+  const total=days*c.price;
+  document.getElementById('mbody').innerHTML=`
+    <div class="cam-top">
+      <div class="cam-thumb">${c.icon}</div>
+      <div class="cam-ti"><h3>${c.name}</h3><p>${fmt(s)} → ${fmt(ed)} · ${days} hari</p><div class="cam-ti-price">Total: Rp ${total.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div class="steps">
+      <div class="step-dot">1</div>
+      <div class="step-line on"></div>
+      <div class="step-dot on">2</div>
+      <div class="step-line"></div>
+      <div class="step-dot">3</div>
+    </div>
+    <div class="fg"><label>Nama lengkap kamu *</label><input id="fn" type="text" placeholder="Nama sesuai KTP"/></div>
+    <div class="frow">
+      <div class="fg"><label>No WhatsApp *</label><input id="fw" type="tel" placeholder="08xxxxxxxxx"/></div>
+      <div class="fg"><label>No KTP *</label><input id="fk" type="text" placeholder="16 digit NIK"/></div>
+    </div>
+    <div class="fg"><label>Alamat lengkap (untuk COD) *</label><textarea id="fa" rows="2" placeholder="Jl. ... Depok"></textarea></div>
+    <div class="fg"><label>Catatan (opsional)</label><input id="fc" type="text" placeholder="Minta charger extra, dll."/></div>
+    <div class="cod-box" style="margin-bottom:12px">
+      <div class="cod-box-title">Metode bayar: COD (Cash on Delivery)</div>
+      <div class="cod-box-desc">Tidak ada transfer di muka. Bayar tunai Rp ${total.toLocaleString('id-ID')} saat kamera tiba di tanganmu.</div>
+    </div>
+    <div class="total-strip">
+      <div><div class="lbl">Total yang disiapkan</div><div style="font-size:0.7rem;color:#6060A0">${days} hari × Rp ${c.price.toLocaleString('id-ID')}</div></div>
+      <div class="amt">Rp ${total.toLocaleString('id-ID')}</div>
+    </div>
+    <button class="back-btn" onclick="renderS1()">← Kembali</button>
+    <button class="submit-btn" onclick="doSubmit()">Konfirmasi Pesanan</button>`;
+}
+
+function doSubmit(){
+  const fn=document.getElementById('fn').value.trim();
+  const fw=document.getElementById('fw').value.trim();
+  const fk=document.getElementById('fk').value.trim();
+  const fa=document.getElementById('fa').value.trim();
+  if(!fn||!fw||!fk||!fa){alert('Lengkapin dulu yaa semua data yang wajib diisi (*)');return;}
+  const c=curCam;
+  const ed=e||s;
+  const days=diff(s,ed);
+  const total=days*c.price;
+  const oid='ADY-'+Math.random().toString(36).slice(2,7).toUpperCase();
+  document.getElementById('mbody').innerHTML=`
+    <div class="success">
+      <span class="success-icon" style="font-size:52px">🎉</span>
+      <h3>Pesanan masuk, ${fn.split(' ')[0]}!</h3>
+      <p>Admin bakal WA kamu sebentar lagi buat konfirmasi jadwal pengiriman. Siapkan KTP & uang tunai ya!</p>
+      <div class="success-id">ID: ${oid}</div>
+      <div style="background:#F8F4FF;border-radius:12px;padding:14px;text-align:left;font-size:0.8rem;border:1.5px solid #E0D8FF;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Kamera</span><span style="font-weight:600">${c.name}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Tanggal</span><span style="font-weight:600">${fmt(s)} – ${fmt(ed)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Durasi</span><span style="font-weight:600">${days} hari</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="font-weight:600">Total COD</span><span style="font-weight:700;color:var(--pink)">Rp ${total.toLocaleString('id-ID')}</span></div>
+      </div>
+      <button class="wa-btn">Hubungi Admin WA</button>
+      <div style="margin-top:10px"><button onclick="closeM()" style="background:none;border:none;color:var(--muted);font-size:0.78rem;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif">Kembali ke katalog</button></div>
+    </div>`;
+}
+
+render();
+</script>
