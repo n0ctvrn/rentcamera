@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Daftar Pesanan</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --pink:#FF6B9D;--pink2:#FFD6E8;--pink3:#FFF0F6;
+      --yellow:#FFE566;--yellow2:#FFF9CC;
+      --green:#4ECDC4;--green2:#E0FAF8;
+      --dark:#1A1A2E;--dark2:#2D2D44;
+      --soft:#F8F4FF;--border:rgba(26,26,46,0.1);
+      --muted:#8585A4;
+    }
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:#FAFAFA;color:var(--dark);padding:20px;max-width:1200px;margin:0 auto}
+    h1{color:var(--dark);margin-bottom:20px;text-align:center}
+    table{width:100%;border-collapse:collapse;margin-top:20px;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+    th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
+    th{background:var(--dark);color:white;font-weight:600}
+    tr:hover{background:var(--soft)}
+    .loading{text-align:center;padding:20px}
+    .error{color:red;text-align:center;padding:20px}
+  </style>
+</head>
+<body>
+  <h1>Daftar Pesanan</h1>
+  <table id="ordersTable">
+    <thead>
+      <tr>
+        <th>ID Pesanan</th>
+        <th>Kamera</th>
+        <th>Tanggal Mulai</th>
+        <th>Tanggal Akhir</th>
+        <th>Durasi</th>
+        <th>Total</th>
+        <th>Nama</th>
+        <th>Telepon</th>
+        <th>KTP</th>
+        <th>Alamat</th>
+        <th>Catatan</th>
+        <th>Dibuat</th>
+      </tr>
+    </thead>
+    <tbody id="ordersBody">
+      <tr>
+        <td colspan="12" class="loading">Memuat data...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    async function loadOrders() {
+      try {
+        const response = await fetch('/api/orders');
+        if (!response.ok) {
+          throw new Error('Gagal memuat data');
+        }
+        const orders = await response.json();
+        const tbody = document.getElementById('ordersBody');
+        tbody.innerHTML = '';
+        if (orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:20px">Belum ada pesanan</td></tr>';
+          return;
+        }
+        orders.forEach(order => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${order.id}</td>
+            <td>${order.cameraName}</td>
+            <td>${order.start}</td>
+            <td>${order.end}</td>
+            <td>${order.duration} hari</td>
+            <td>Rp ${order.total.toLocaleString()}</td>
+            <td>${order.name}</td>
+            <td>${order.phone}</td>
+            <td>${order.ktp}</td>
+            <td>${order.address}</td>
+            <td>${order.note || '-'}</td>
+            <td>${new Date(order.created).toLocaleString()}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        document.getElementById('ordersBody').innerHTML = '<tr><td colspan="12" class="error">Error: ' + error.message + '</td></tr>';
+      }
+    }
+
+    loadOrders();
+  </script>
+</body>
+</html>

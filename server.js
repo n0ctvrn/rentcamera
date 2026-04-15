@@ -2,6 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const basicAuth = require('express-basic-auth');
 
 const DB_FILE = path.join(__dirname, 'rentcamera.db');
 const app = express();
@@ -9,6 +10,24 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(__dirname));
+
+const auth = basicAuth({
+  users: { 'admin': 'admin123' },
+  challenge: true,
+  realm: 'Admin Area'
+});
+
+app.get('/api/orders', auth, (req, res) => {
+  const db = openDb();
+  db.all('SELECT * FROM orders ORDER BY created DESC', (err, orders) => {
+    if (err) {
+      db.close();
+      return res.status(500).json({ message: 'Database error' });
+    }
+    res.json(orders);
+    db.close();
+  });
+});
 
 function openDb() {
   return new sqlite3.Database(DB_FILE);
@@ -183,6 +202,10 @@ app.post('/api/book', (req, res) => {
       });
     });
   });
+});
+
+app.get('/admin', auth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 app.get('*', (req, res) => {

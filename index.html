@@ -172,7 +172,9 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
 
 <nav>
   <div class="nav-logo">Nadoy<span>digicam</span></div>
-  <button class="nav-wa">WA Admin</button>
+  <div style="display:flex;gap:8px">
+    <button class="nav-wa">WA Admin</button>
+  </div>
 </nav>
 
 <div class="hero">
@@ -182,7 +184,7 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
   <div class="hero-pills">
     <span class="hero-pill">Sony Cybershot</span>
     <span class="hero-pill">Canon IXUS</span>
-    <span class="hero-pill">Lumix</span>
+    <span class="hero-pill">Lumix</span>q
     <span class="hero-pill">+ Aksesoris</span>
   </div>
   <span class="hero-cam" style="font-size:16px">📷</span>
@@ -247,7 +249,10 @@ nav{background:var(--dark);padding:12px 20px;display:flex;align-items:center;jus
 
 <script>
 let cameras=[];
-let curCam=null,s=null,e=null,yr=2025,mo=5;
+let curCam=null,s=null,e=null;
+const now = new Date();
+let yr=now.getFullYear();
+let mo=now.getMonth();
 
 function isAvail(cam){const t=new Date().toISOString().slice(0,10);return !cam.booked.includes(t);}
 
@@ -335,16 +340,30 @@ function prevMo(){mo--;if(mo<0){mo=11;yr--;}renderS1();}
 function nextMo(){mo++;if(mo>11){mo=0;yr++;}renderS1();}
 
 function pickDate(d){
-  if(!s||(s&&e)){s=d;e=null;}
-  else if(d<s){s=d;}
-  else{
-    e=d;
-    let conflict=false;
-    const bk=curCam.booked;
-    for(let cur=new Date(s);cur<=new Date(e);cur.setDate(cur.getDate()+1)){
-      if(bk.includes(cur.toISOString().slice(0,10))){conflict=true;break;}
+  if(!s || (s && e)){
+    s = d;
+    e = null;
+  } else if(!e){
+    if(d === s){
+      e = d;
+    } else if(d > s){
+      e = d;
+    } else {
+      e = s;
+      s = d;
     }
-    if(conflict){s=d;e=null;}
+    let conflict = false;
+    const bk = curCam.booked;
+    for(let cur=new Date(s); cur<=new Date(e); cur.setDate(cur.getDate()+1)){
+      if(bk.includes(cur.toISOString().slice(0,10))){
+        conflict = true;
+        break;
+      }
+    }
+    if(conflict){
+      s = d;
+      e = null;
+    }
   }
   renderS1();
 }
@@ -374,7 +393,7 @@ function renderS1(){
       <div class="step-line"></div>
       <div class="step-dot">3</div>
     </div>
-    <div style="font-size:0.78rem;font-weight:600;margin-bottom:10px">Pilih tanggal mulai lalu tanggal selesai sewa:</div>
+    <div style="font-size:0.78rem;font-weight:600;margin-bottom:10px">Pilih tanggal mulai lalu tanggal selesai sewa. Durasi bisa lebih dari 2 hari.</div>
     ${renderCal()}
     <div class="cal-legend">
       <div class="lg-item"><div class="lg-dot" style="background:white;border:1px solid #ddd"></div>Tersedia</div>
@@ -482,7 +501,7 @@ async function doSubmit(){
     <div class="success">
       <span class="success-icon" style="font-size:52px">🎉</span>
       <h3>Pesanan masuk, ${fn.split(' ')[0]}!</h3>
-      <p>Admin bakal WA kamu sebentar lagi buat konfirmasi jadwal pengiriman. Siapkan KTP & uang tunai ya!</p>
+      <p>Admin bakal WA kamu sebentar lagi buat konfirmasi jadwal pengiriman, dan anda akan diminta menyelesaikan pembayaran DP 50%. Siapkan foto KTP ya!</p>
       <div class="success-id">ID: ${orderId}</div>
       <div style="background:#F8F4FF;border-radius:12px;padding:14px;text-align:left;font-size:0.8rem;border:1.5px solid #E0D8FF;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(0,0,0,0.07)"><span style="color:var(--muted)">Kamera</span><span style="font-weight:600">${c.name}</span></div>
