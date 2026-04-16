@@ -204,16 +204,13 @@ app.post('/api/book', (req, res) => {
   });
 });
 
-// ADMIN
-app.get('/admin', auth, (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
-});
-
-// ROOT (halaman utama)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/admin', auth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
 initDb();
 
 app.listen(port, () => {
