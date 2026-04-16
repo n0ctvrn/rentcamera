@@ -214,6 +214,6 @@ app.get('/', (req, res) => {
 
 initDb();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server berjalan di http://localhost:${port}`);
 });
