@@ -2,22 +2,159 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
-const basicAuth = require('express-basic-auth');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
 
 const DB_FILE = path.join(__dirname, 'rentcamera.db');
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(session({
+  secret: 'your-secret-key-rentcamera-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000, httpOnly: true }
+}));
 
-const auth = basicAuth({
-  users: { 'admin': 'admin123' },
-  challenge: true,
-  realm: 'Admin Area'
+// Custom middleware untuk protect root route
+app.get('/', (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
 });
 
-app.get('/api/orders', auth, (req, res) => {
+// Static files SETELAH session middleware dan route proteksi
+app.use(express.static(__dirname));
+
+// Middleware untuk check login
+const checkLogin = (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: 'Silakan login terlebih dahulu' });
+  }
+  next();
+};
+
+const checkAdmin = (req, res, next) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Anda tidak memiliki akses' });
+  }
+  next();
+};
+
+// API: Login
+app.post('/api/login', (req, res) => {
+  const { username, password, userType } = req.body;
+
+  if (!username || !password || !userType) {
+    return res.status(400).json({ message: 'Username, password, dan tipe user harus diisi' });
+  }
+
+  if (userType === 'admin' && username === 'admin' && password === 'admin123') {
+    req.session.user = { id: 1, username: 'admin', role: 'admin' };
+    return res.json({ message: 'Login berhasil', role: 'admin' });
+  }
+
+  const db = openDb();
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
+    if (err) {
+      db.close();
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (!user) {
+      db.close();
+      return res.status(401).json({ message: 'Username atau password salah' });
+    }
+
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      db.close();
+      if (err) {
+        return res.status(500).json({ message: 'Terjadi kesalahan' });
+      }
+
+      if (!isMatch) {
+        return res.status(401).json({ message: 'Username atau password salah' });
+      }
+
+      req.session.user = { id: user.id, username: user.username, role: 'user' };
+      res.json({ message: 'Login berhasil', role: 'user' });
+    });
+  });
+});
+
+// API: Logout
+app.post('/api/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: 'Logout gagal' });
+    }
+    res.json({ message: 'Logout berhasil' });
+  });
+});
+
+// API: Check session
+app.get('/api/session', (req, res) => {
+  if (req.session.user) {
+    res.json({ user: req.session.user });
+  } else {
+    res.status(401).json({ message: 'Tidak ada session' });
+  }
+});
+
+// API: Register user
+app.post('/api/register', (req, res) => {
+  const { username, password, passwordConfirm } = req.body;
+
+  if (!username || !password || !passwordConfirm) {
+    return res.status(400).json({ message: 'Semua field wajib diisi' });
+  }
+
+  if (password !== passwordConfirm) {
+    return res.status(400).json({ message: 'Password tidak cocok' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'Password minimal 6 karakter' });
+  }
+
+  const db = openDb();
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
+    if (err) {
+      db.close();
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (user) {
+      db.close();
+      return res.status(409).json({ message: 'Username sudah digunakan' });
+    }
+
+    bcrypt.hash(password, 10, (err, hash) => {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: 'Terjadi kesalahan' });
+      }
+
+      db.run('INSERT INTO users (username, password, created) VALUES (?, ?, ?)',
+        [username, hash, new Date().toISOString()],
+        (err) => {
+          db.close();
+          if (err) {
+            return res.status(500).json({ message: 'Database error' });
+          }
+          res.json({ message: 'Registrasi berhasil, silakan login' });
+        }
+      );
+    });
+  });
+});
+
+// ============ ADMIN APIs - ORDERS ============
+
+// API: Get all orders (admin)
+app.get('/api/admin/orders', checkAdmin, (req, res) => {
   const db = openDb();
   db.all('SELECT * FROM orders ORDER BY created DESC', (err, orders) => {
     if (err) {
@@ -25,6 +162,104 @@ app.get('/api/orders', auth, (req, res) => {
       return res.status(500).json({ message: 'Database error' });
     }
     res.json(orders);
+    db.close();
+  });
+});
+
+// ============ ADMIN APIs - CAMERA CATALOG ============
+
+// API: Add new camera (admin)
+app.post('/api/admin/cameras', checkAdmin, (req, res) => {
+  const { name, sub, cat, price, icon } = req.body;
+
+  if (!name || !sub || !cat || !price || !icon) {
+    return res.status(400).json({ message: 'Semua field wajib diisi' });
+  }
+
+  const db = openDb();
+  db.run('INSERT INTO cameras (name, sub, cat, price, icon) VALUES (?, ?, ?, ?, ?)',
+    [name, sub, cat, parseInt(price), icon],
+    function(err) {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: 'Database error' });
+      }
+      res.json({ message: 'Kamera berhasil ditambahkan', id: this.lastID });
+      db.close();
+    }
+  );
+});
+
+// API: Update camera (admin)
+app.put('/api/admin/cameras/:id', checkAdmin, (req, res) => {
+  const { id } = req.params;
+  const { name, sub, cat, price, icon } = req.body;
+
+  if (!name || !sub || !cat || !price || !icon) {
+    return res.status(400).json({ message: 'Semua field wajib diisi' });
+  }
+
+  const db = openDb();
+  db.run('UPDATE cameras SET name = ?, sub = ?, cat = ?, price = ?, icon = ? WHERE id = ?',
+    [name, sub, cat, parseInt(price), icon, id],
+    function(err) {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: 'Database error' });
+      }
+      if (this.changes === 0) {
+        db.close();
+        return res.status(404).json({ message: 'Kamera tidak ditemukan' });
+      }
+      res.json({ message: 'Kamera berhasil diperbarui' });
+      db.close();
+    }
+  );
+});
+
+// API: Delete camera (admin)
+app.delete('/api/admin/cameras/:id', checkAdmin, (req, res) => {
+  const { id } = req.params;
+
+  const db = openDb();
+  // Cek apakah ada booking untuk kamera ini
+  db.get('SELECT COUNT(*) as count FROM bookings WHERE cameraId = ?', [id], (err, row) => {
+    if (err) {
+      db.close();
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (row.count > 0) {
+      db.close();
+      return res.status(400).json({ message: 'Tidak bisa menghapus kamera yang memiliki pemesanan' });
+    }
+
+    db.run('DELETE FROM cameras WHERE id = ?', [id], function(err) {
+      if (err) {
+        db.close();
+        return res.status(500).json({ message: 'Database error' });
+      }
+      if (this.changes === 0) {
+        db.close();
+        return res.status(404).json({ message: 'Kamera tidak ditemukan' });
+      }
+      res.json({ message: 'Kamera berhasil dihapus' });
+      db.close();
+    });
+  });
+});
+
+// ============ USER APIs ============
+
+// API: Get user's bookings
+app.get('/api/user/bookings', checkLogin, (req, res) => {
+  const db = openDb();
+  db.all('SELECT * FROM orders ORDER BY created DESC', (err, bookings) => {
+    if (err) {
+      db.close();
+      return res.status(500).json({ message: 'Database error' });
+    }
+    res.json(bookings);
     db.close();
   });
 });
@@ -42,8 +277,17 @@ function openDb() {
 function initDb() {
   const db = openDb();
   db.serialize(() => {
+    // Users table
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      created TEXT
+    )`);
+
+    // Cameras table
     db.run(`CREATE TABLE IF NOT EXISTS cameras (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       sub TEXT,
       cat TEXT,
@@ -82,16 +326,16 @@ function initDb() {
         return;
       }
       if (row.count === 0) {
-        const stmt = db.prepare('INSERT INTO cameras (id, name, sub, cat, price, icon) VALUES (?, ?, ?, ?, ?, ?)');
+        const stmt = db.prepare('INSERT INTO cameras (name, sub, cat, price, icon) VALUES (?, ?, ?, ?, ?)');
         const items = [
-          [1, 'Sony Cybershot WX220', 'Sony · Standard', 'standard', 50000, '📷'],
-          [2, 'Canon IXUS 185', 'Canon · Standard', 'standard', 50000, '📸'],
-          [3, 'Lumix DMC-TZ70', 'Panasonic · Premium', 'premium', 50000, '🎞️'],
-          [4, 'Sony ZV-1', 'Sony · Premium', 'premium', 50000, '🎥'],
-          [5, 'Fujifilm FinePix XP140', 'Fujifilm · Standard', 'standard', 50000, '📷'],
-          [6, 'Tripod + Memory Card', 'Aksesoris · Bundle', 'aksesoris', 50000, '🎒']
+          ['Sony Cybershot WX220', 'Sony · Standard', 'standard', 50000, '📷'],
+          ['Canon IXUS 185', 'Canon · Standard', 'standard', 50000, '📸'],
+          ['Lumix DMC-TZ70', 'Panasonic · Premium', 'premium', 50000, '🎞️'],
+          ['Sony ZV-1', 'Sony · Premium', 'premium', 50000, '🎥'],
+          ['Fujifilm FinePix XP140', 'Fujifilm · Standard', 'standard', 50000, '📷'],
+          ['Tripod + Memory Card', 'Aksesoris · Bundle', 'aksesoris', 50000, '🎒']
         ];
-        items.forEach(item => stmt.run(item));
+        items.forEach(item => stmt.run(...item));
         stmt.finalize(() => db.close());
       } else {
         db.close();
@@ -214,9 +458,27 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/admin', auth, (req, res) => {
+app.get('/login', (req, res) => {
+  if (req.session.user) {
+    return res.redirect(req.session.user.role === 'admin' ? '/admin' : '/user-dashboard');
+  }
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/admin', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.redirect('/login');
+  }
   res.sendFile(path.join(__dirname, 'admin.html'));
 });
+
+app.get('/user-dashboard', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'user') {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'user-dashboard.html'));
+});
+
 initDb();
 
 app.listen(port, () => {

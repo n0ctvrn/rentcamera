@@ -9,6 +9,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "express-basic-auth": "^1.2.1",
+    "express-session": "^1.17.3",
+    "bcryptjs": "^2.4.3",
     "sqlite3": "^5.1.6"
   }
 }

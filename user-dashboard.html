@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - Rent Camera</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#09020f;
+      --surface:#110a23;
+      --accent:#E22F80;
+      --accent-alt:#8140DC;
+      --text:#f5ecff;
+      --text-soft:#d5c7f0;
+      --muted:#b8aee4;
+      --border:rgba(255,255,255,0.08);
+    }
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:radial-gradient(circle at top left,rgba(130,64,220,0.16),transparent 30%),radial-gradient(circle at 80% 15%,rgba(226,47,128,0.14),transparent 20%),linear-gradient(180deg,#05030b,#110821);color:var(--text);padding:20px}
+    .navbar{display:flex;justify-content:space-between;align-items:center;background:rgba(11,7,23,0.94);backdrop-filter:blur(18px);padding:16px 24px;border-radius:16px;margin-bottom:24px;border:1px solid var(--border);max-width:1200px;margin-left:auto;margin-right:auto}
+    .navbar h1{font-size:1.3rem;font-weight:800;margin:0}
+    .navbar h1 span{color:var(--accent)}
+    .navbar-right{display:flex;gap:16px;align-items:center}
+    .user-info{font-size:0.9rem;color:var(--muted)}
+    .btn-logout{background:rgba(226,47,128,0.16);color:var(--accent);border:1px solid rgba(226,47,128,0.3);padding:10px 16px;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.2s;font-family:inherit}
+    .btn-logout:hover{background:rgba(226,47,128,0.24)}
+    .container{max-width:1200px;margin:0 auto}
+    .section-header{margin-bottom:24px}
+    .section-header h2{font-size:1.5rem;margin-bottom:8px}
+    .section-header p{color:var(--text-soft);font-size:0.95rem}
+    .stats-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+    .stat-card{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03));border:1px solid var(--border);border-radius:16px;padding:18px;text-align:center}
+    .stat-value{font-size:1.8rem;font-weight:800;color:var(--accent);margin-bottom:4px}
+    .stat-label{font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em}
+    table{width:100%;border-collapse:collapse;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+    th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--border);font-size:0.9rem}
+    th{background:rgba(255,255,255,0.08);font-weight:700;color:var(--text)}
+    tr:hover{background:rgba(255,255,255,0.06)}
+    .badge{display:inline-block;padding:6px 12px;border-radius:8px;font-size:0.8rem;font-weight:600}
+    .badge-completed{background:rgba(76,175,80,0.16);color:#a8e6a1}
+    .badge-pending{background:rgba(255,193,7,0.16);color:#ffc951}
+    .loading{text-align:center;padding:40px 20px;color:var(--muted);font-size:0.95rem}
+    .error{background:rgba(255,0,0,0.16);border:1px solid rgba(255,0,0,0.3);color:#ff9999;padding:14px 16px;border-radius:12px;margin-bottom:20px}
+    .empty-state{text-align:center;padding:40px 20px}
+    .empty-state-icon{font-size:3rem;margin-bottom:12px}
+    .empty-state-title{font-size:1.2rem;font-weight:600;margin-bottom:8px;color:var(--text)}
+    .empty-state-text{color:var(--text-soft);font-size:0.95rem;margin-bottom:16px}
+    .btn-primary{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:600;font-family:inherit;transition:all 0.2s}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(226,47,128,0.3)}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>Rent<span>Camera</span></h1>
+    <div class="navbar-right">
+      <div class="user-info">Halo, <strong id="user-name">-</strong>!</div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="section-header">
+      <h2>Dashboard Pemesanan</h2>
+      <p>Lihat dan kelola semua pemesanan kamera Anda</p>
+    </div>
+
+    <div id="stats-container" class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-value" id="total-bookings">0</div>
+        <div class="stat-label">Total Pemesanan</div>
+      </div>
+    </div>
+
+    <div id="error-message" class="error" style="display:none;"></div>
+
+    <div id="bookings-container">
+      <div class="loading">Memuat data pemesanan...</div>
+    </div>
+  </div>
+
+  <script>
+    // Check login
+    async function checkLogin() {
+      try {
+        const response = await fetch('/api/session');
+        if (!response.ok) {
+          window.location.href = '/login';
+          return;
+        }
+        const data = await response.json();
+        document.getElementById('user-name').textContent = data.user.username;
+      } catch {
+        window.location.href = '/login';
+      }
+    }
+
+    // Load user bookings
+    async function loadBookings() {
+      try {
+        const response = await fetch('/api/user/bookings');
+        if (!response.ok) {
+          throw new Error('Gagal memuat pemesanan');
+        }
+        
+        const bookings = await response.json();
+        const container = document.getElementById('bookings-container');
+        
+        document.getElementById('total-bookings').textContent = bookings.length;
+
+        if (bookings.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">📷</div>
+              <div class="empty-state-title">Belum Ada Pemesanan</div>
+              <div class="empty-state-text">Anda belum membuat pesanan apapun. Kembali ke halaman utama untuk memulai pemesanan.</div>
+              <a href="/" style="text-decoration:none"><button class="btn-primary">Jelajahi Katalog</button></a>
+            </div>
+          `;
+          return;
+        }
+
+        let html = '<table><thead><tr><th>ID Pesanan</th><th>Kamera</th><th>Tanggal Mulai</th><th>Tanggal Berakhir</th><th>Durasi</th><th>Total</th><th>Status</th><th>Nama Pemesan</th></tr></thead><tbody>';
+        
+        bookings.forEach(booking => {
+          const startDate = new Date(booking.start);
+          const endDate = new Date(booking.end);
+          const today = new Date();
+          const status = endDate < today ? 'Selesai' : 'Aktif';
+          const statusClass = status === 'Selesai' ? 'badge-completed' : 'badge-pending';
+          
+          html += `<tr>
+            <td><strong>${booking.id}</strong></td>
+            <td>${booking.cameraName}</td>
+            <td>${booking.start}</td>
+            <td>${booking.end}</td>
+            <td>${booking.duration} hari</td>
+            <td>Rp ${booking.total.toLocaleString()}</td>
+            <td><span class="badge ${statusClass}">${status}</span></td>
+            <td>${booking.name}</td>
+          </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } catch (err) {
+        const container = document.getElementById('bookings-container');
+        container.innerHTML = '';
+        const errorMsg = document.getElementById('error-message');
+        errorMsg.textContent = err.message;
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    // Logout
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    checkLogin();
+    loadBookings();
+  </script>
+</body>
+</html>

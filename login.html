@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Rent Camera</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #09020f;
+      --surface: #110a23;
+      --surface-alt: #15082f;
+      --accent: #E22F80;
+      --accent-alt: #8140DC;
+      --accent-soft: rgba(130, 64, 220, 0.16);
+      --muted: #b8aee4;
+      --text: #f5ecff;
+      --text-soft: #d5c7f0;
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow: 0 32px 90px rgba(0, 0, 0, 0.35);
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at top left, rgba(130, 64, 220, 0.16), transparent 30%),
+                  radial-gradient(circle at 80% 15%, rgba(226, 47, 128, 0.14), transparent 20%),
+                  linear-gradient(180deg, #05030b, #110821);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: linear-gradient(180deg, #11172f, #0d1330);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      padding: 40px;
+      box-shadow: var(--shadow);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .login-header p {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab {
+      flex: 1;
+      padding: 14px 0;
+      background: none;
+      border: none;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.25s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: all 0.2s;
+    }
+    input:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(226, 47, 128, 0.1);
+    }
+    input::placeholder {
+      color: var(--muted);
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    button {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 18px 38px rgba(226, 47, 128, 0.28);
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 48px rgba(226, 47, 128, 0.35);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .alert {
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert.error {
+      background: rgba(226, 47, 128, 0.16);
+      color: #ffc4d6;
+      border: 1px solid rgba(226, 47, 128, 0.3);
+    }
+    .alert.success {
+      background: rgba(76, 175, 80, 0.16);
+      color: #a8e6a1;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+    .alert.show {
+      display: block;
+    }
+    .link-text {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+    }
+    .link-text a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .link-text a:hover {
+      text-decoration: underline;
+    }
+    .loading::after {
+      content: '.';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60% { content: '...'; }
+      80%, 100% { content: ''; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Rent <span>Camera</span></h1>
+      <p>Sewa Kamera Profesional Mudah & Terjangkau</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(event, 'user-login')">User Login</button>
+      <button class="tab" onclick="switchTab(event, 'admin-login')">Admin</button>
+      <button class="tab" onclick="switchTab(event, 'register')">Register</button>
+    </div>
+
+    <!-- User Login Tab -->
+    <div id="user-login" class="tab-content active">
+      <div class="alert" id="alert-user"></div>
+      <form onsubmit="handleUserLogin(event)">
+        <div class="form-group">
+          <label for="user-username">Username</label>
+          <input type="text" id="user-username" placeholder="Masukkan username Anda" required>
+        </div>
+        <div class="form-group">
+          <label for="user-password">Password</label>
+          <input type="password" id="user-password" placeholder="Masukkan password Anda" required>
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn-primary">Login</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Admin Login Tab -->
+    <div id="admin-login" class="tab-content">
+      <div class="alert" id="alert-admin"></div>
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label for="admin-username">Username Admin</label>
+          <input type="text" id="admin-username" placeholder="Masukkan username admin" required>
+        </div>
+        <div class="form-group">
+          <label for="admin-password">Password Admin</label>
+          <input type="password" id="admin-password" placeholder="Masukkan password admin" required>
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn-primary">Login Admin</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Register Tab -->
+    <div id="register" class="tab-content">
+      <div class="alert" id="alert-register"></div>
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input type="text" id="reg-username" placeholder="Pilih username unik" required>
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input type="password" id="reg-password" placeholder="Minimal 6 karakter" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label for="reg-password-confirm">Konfirmasi Password</label>
+          <input type="password" id="reg-password-confirm" placeholder="Ketik password yang sama" required>
+        </div>
+        <div class="button-group">
+          <button type="submit" class="btn-primary">Daftar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(e, tabName) {
+      e.preventDefault();
+      
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+      
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+      e.target.classList.add('active');
+    }
+
+    function showAlert(elementId, message, type = 'error') {
+      const alert = document.getElementById(elementId);
+      alert.textContent = message;
+      alert.className = `alert show ${type}`;
+    }
+
+    async function handleUserLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('user-username').value;
+      const password = document.getElementById('user-password').value;
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, userType: 'user' })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          showAlert('alert-user', data.message, 'error');
+          return;
+        }
+
+        showAlert('alert-user', 'Login berhasil! Redirect ke katalog...', 'success');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      } catch (err) {
+        showAlert('alert-user', 'Terjadi kesalahan: ' + err.message, 'error');
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('admin-username').value;
+      const password = document.getElementById('admin-password').value;
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, userType: 'admin' })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          showAlert('alert-admin', data.message, 'error');
+          return;
+        }
+
+        showAlert('alert-admin', 'Login berhasil! Redirect ke admin panel...', 'success');
+        setTimeout(() => {
+          window.location.href = '/admin';
+        }, 1000);
+      } catch (err) {
+        showAlert('alert-admin', 'Terjadi kesalahan: ' + err.message, 'error');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value;
+      const password = document.getElementById('reg-password').value;
+      const passwordConfirm = document.getElementById('reg-password-confirm').value;
+
+      if (password !== passwordConfirm) {
+        showAlert('alert-register', 'Password tidak cocok', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, passwordConfirm })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          showAlert('alert-register', data.message, 'error');
+          return;
+        }
+
+        showAlert('alert-register', data.message, 'success');
+        setTimeout(() => {
+          document.getElementById('reg-username').value = '';
+          document.getElementById('reg-password').value = '';
+          document.getElementById('reg-password-confirm').value = '';
+          // Switch to login tab
+          document.querySelector('[onclick="switchTab(event, \'user-login\')"]').click();
+        }, 1500);
+      } catch (err) {
+        showAlert('alert-register', 'Terjadi kesalahan: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
