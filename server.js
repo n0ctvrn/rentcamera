@@ -30,7 +30,13 @@ app.get('/api/orders', auth, (req, res) => {
 });
 
 function openDb() {
-  return new sqlite3.Database(DB_FILE);
+  const db = new sqlite3.Database(DB_FILE, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, err => {
+    if (err) {
+      console.error(`Gagal membuka database ${DB_FILE}:`, err.message);
+    }
+  });
+  db.configure('busyTimeout', 5000);
+  return db;
 }
 
 function initDb() {
